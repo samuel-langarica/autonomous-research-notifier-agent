@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from functools import wraps
 import os
+from agent import process_message
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for session management
@@ -52,8 +53,8 @@ def chat():
 @login_required
 def send_message():
     message = request.form.get('message')
-    # For now, return a sample response
-    return {"response": f"Sample response to: {message}"}
+    response = process_message(message)
+    return {"response": response}
 
 if __name__ == '__main__':
     app.run(debug=True)
