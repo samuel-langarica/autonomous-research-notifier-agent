@@ -22,6 +22,10 @@ def start_job_manager():
     job_manager.set_execution_callback(job_execution_callback)
     job_manager.start()
 
+# Start the job manager in a separate thread when the app is created
+job_thread = threading.Thread(target=start_job_manager, daemon=True)
+job_thread.start()
+
 # Login required decorator
 def login_required(f):
     @wraps(f)
@@ -69,9 +73,4 @@ def send_message():
     return {"response": response}
 
 if __name__ == '__main__':
-    # Start the job manager in a separate thread
-    job_thread = threading.Thread(target=start_job_manager, daemon=True)
-    job_thread.start()
-    
-    # Start the Flask app
     app.run(debug=True)
