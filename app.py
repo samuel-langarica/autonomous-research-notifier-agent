@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from functools import wraps
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for session management
@@ -29,7 +30,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username == TEST_USERNAME and password == TEST_PASSWORD:
+        if username == os.environ.get('USERNAME') and password == os.environ.get('PASSWORD'):
             session['username'] = username
             return redirect(url_for('chat'))
         else:
