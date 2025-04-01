@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from functools import wraps
 import os
 from agent import process_message
+from jobs import job_manager
+import threading
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for session management
@@ -9,6 +12,15 @@ app.secret_key = 'your-secret-key-here'  # Required for session management
 # Hardcoded credentials for testing
 TEST_USERNAME = "admin"
 TEST_PASSWORD = "password123"
+
+def job_execution_callback(job_id: str, execution_time: datetime) -> None:
+    """Callback function to handle job executions."""
+    print(f"\n[Job Execution] Job {job_id} executed at {execution_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')}\n")
+
+def start_job_manager():
+    """Start the job manager in a separate thread."""
+    job_manager.set_execution_callback(job_execution_callback)
+    job_manager.start()
 
 # Login required decorator
 def login_required(f):
@@ -57,4 +69,9 @@ def send_message():
     return {"response": response}
 
 if __name__ == '__main__':
+    # Start the job manager in a separate thread
+    job_thread = threading.Thread(target=start_job_manager, daemon=True)
+    job_thread.start()
+    
+    # Start the Flask app
     app.run(debug=True)
